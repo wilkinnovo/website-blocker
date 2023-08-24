@@ -2,6 +2,8 @@
 name = "website-blocker"
 version = "1.0.0"
 edition = "2021"
-
+description = "Blazingly fast command line website blocker"
+license = "MIT"
+repository = "https://github.com/wilkinnovo/website-blocker"
 
 [dependencies]
