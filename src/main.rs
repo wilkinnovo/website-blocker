@@ -1,14 +1,53 @@
 use std::env;
-#[allow(dead_code)]
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
+
 #[derive(Debug)]
 struct Domain {
     name: String,
-    favicon: String,
+}
+
+fn get_hosts_path() -> &'static str {
+    if cfg!(windows) {
+        "C:/Windows/System32/drivers/etc/hosts"
+    } else {
+        "/etc/hosts"
+    }
+}
+
+fn domain_in_hosts_file(domain: &Domain) -> bool {
+    let hosts_path = get_hosts_path();
+    let mut file = File::open(hosts_path).expect("Failed to open hosts file");
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)
+        .expect("Failed to read hosts file");
+    contents.contains(&domain.name) || contents.contains(&format!("www.{}", domain.name))
 }
 
 fn block(domain: Domain) {
-    println!("blocking: {:?}", domain);
+    if domain_in_hosts_file(&domain) {
+        println!("{:?} is already blocked", domain.name);
+    } else {
+        let hosts_path = get_hosts_path();
+
+        // Open the hosts file in append mode
+        let mut file = OpenOptions::new()
+            .append(true)
+            .open(hosts_path)
+            .expect("Failed to open hosts file for appending");
+
+        // Write the domain and www.domain to the hosts file
+        if let Err(e) = writeln!(file, "127.0.0.1 {}", domain.name) {
+            eprintln!("Error writing to hosts file: {}", e);
+        }
+        if let Err(e) = writeln!(file, "127.0.0.1 www.{}", domain.name) {
+            eprintln!("Error writing to hosts file: {}", e);
+        }
+
+        println!("Blocked: {:?}", domain.name);
+    }
 }
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -19,11 +58,11 @@ fn main() {
                 let name = &args[2];
                 let domain = Domain {
                     name: name.to_string(),
-                    favicon: "google.com/favicon".to_string(),
                 };
-                // Logging
-                println!("ACTION: {}", action);
-                println!("DOMAIN: {}", name);
+
+                println!("Action: {}", action);
+                println!("Domain: {}", name);
+
                 // Block
                 block(domain);
             } else {
