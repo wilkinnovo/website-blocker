@@ -2,7 +2,6 @@ use std::env;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 
-#[allow(dead_code)]
 #[derive(Debug)]
 struct Domain {
     name: String,
