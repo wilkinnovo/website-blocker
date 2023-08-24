@@ -21,9 +21,10 @@ fn main() {
                     name: name.to_string(),
                     favicon: "google.com/favicon".to_string(),
                 };
+                // Logging
                 println!("ACTION: {}", action);
                 println!("DOMAIN: {}", name);
-
+                // Block
                 block(domain);
             } else {
                 println!("Missing block argument");
