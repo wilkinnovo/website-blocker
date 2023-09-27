@@ -1,4 +1,4 @@
-# Blazingly fast command line website blocker
+# One-way website blocker. It only does one thing. BLOCK ~use @ your own peril.
 
 # Usage
 
